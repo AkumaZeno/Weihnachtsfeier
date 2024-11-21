@@ -60,6 +60,58 @@
             font-weight: bold;
             color: #dc3545;
         }
+
+        /* Modal styles */
+        #leaderboard-modal {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 80%;
+            max-width: 400px;
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            padding: 20px;
+            z-index: 1000;
+        }
+
+        #leaderboard-modal h3 {
+            margin-bottom: 10px;
+        }
+
+        #leaderboard-modal ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        #leaderboard-modal li {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+
+        #overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 999;
+        }
+
+        #close-modal {
+            background-color: #dc3545;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            padding: 5px 10px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
     </style>
 </head>
 <body>
@@ -69,6 +121,7 @@
             <p>Gib deinen Namen ein, um zu starten:</p>
             <input type="text" id="player-name" placeholder="Dein Name" required>
             <button id="start-button">Quiz starten</button>
+            <button id="view-leaderboard">Rangliste anzeigen</button>
         </div>
 
         <div id="quiz-screen" style="display: none;">
@@ -81,11 +134,19 @@
         <div id="result-screen" style="display: none;">
             <h1>Quiz beendet!</h1>
             <p>Dein Ergebnis: <span id="score"></span> Punkte.</p>
-            <h3>Rangliste</h3>
-            <ul id="leaderboard"></ul>
             <button id="restart-button">Erneut spielen</button>
+            <button id="view-leaderboard">Rangliste anzeigen</button>
         </div>
     </div>
+
+    <!-- Modal für Rangliste -->
+    <div id="overlay"></div>
+    <div id="leaderboard-modal">
+        <h3>Rangliste</h3>
+        <ul id="leaderboard"></ul>
+        <button id="close-modal">Schließen</button>
+    </div>
+
     <script>
         const questions = [
             {
@@ -120,10 +181,14 @@
         const scoreElement = document.getElementById("score");
         const timerElement = document.getElementById("timer");
         const leaderboardElement = document.getElementById("leaderboard");
+        const leaderboardModal = document.getElementById("leaderboard-modal");
+        const overlay = document.getElementById("overlay");
 
         document.getElementById("start-button").addEventListener("click", startQuiz);
         nextButton.addEventListener("click", showNextQuestion);
         document.getElementById("restart-button").addEventListener("click", restartQuiz);
+        document.getElementById("view-leaderboard").addEventListener("click", showLeaderboard);
+        document.getElementById("close-modal").addEventListener("click", closeLeaderboard);
 
         function startQuiz() {
             playerName = document.getElementById("player-name").value.trim();
@@ -185,31 +250,23 @@
             leaderboard.push({ name: playerName, score });
             leaderboard.sort((a, b) => b.score - a.score);
             localStorage.setItem("leaderboard", JSON.stringify(leaderboard));
+        }
 
+        function showLeaderboard() {
+            updateLeaderboard();
+            leaderboardModal.style.display = "block";
+            overlay.style.display = "block";
+        }
+
+        function closeLeaderboard() {
+            leaderboardModal.style.display = "none";
+            overlay.style.display = "none";
+        }
+
+        function updateLeaderboard() {
             leaderboardElement.innerHTML = leaderboard
-                .map(entry => `<li>${entry.name}: ${entry.score} Punkte</li>`)
-                .join("");
-        }
-
-        function restartQuiz() {
-            resultScreen.style.display = "none";
-            startScreen.style.display = "block";
-        }
-
-        function resetTimer() {
-            clearInterval(timer);
-            let timeLeft = 10;
-            timerElement.textContent = timeLeft;
-            timer = setInterval(() => {
-                timeLeft--;
-                timerElement.textContent = timeLeft;
-                if (timeLeft <= 0) {
-                    clearInterval(timer);
-                    nextButton.style.display = "block";
-                    Array.from(answersElement.children).forEach(button => (button.disabled = true));
-                }
-            }, 1000);
-        }
-    </script>
-</body>
-</html>
+                .map((entry, index) => `
+                    <li>
+                        ${entry.name}
+                        <span>${entry.score} Punkte</span>
+                        <button onclick="deletePlayer(${index})" style="background-color: #dc3545; color
