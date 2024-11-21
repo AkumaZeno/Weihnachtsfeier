@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weihnachtsquiz</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f7f7f7;
+        }
+
+        #quiz-container {
+            text-align: center;
+            padding: 20px;
+            background-color: #ffffff;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            width: 90%;
+            max-width: 500px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+
+        button:hover {
+            background-color: #218838;
+        }
+
+        #answers button {
+            display: block;
+            margin: 10px auto;
+            width: 100%;
+        }
+
+        #next-button {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div id="quiz-container">
+        <div id="start-screen">
+            <h1>Willkommen zum Weihnachtsquiz!</h1>
+            <p>Teste dein Wissen rund um Weihnachten!</p>
+            <button id="start-button">Quiz starten</button>
+        </div>
+
+        <div id="quiz-screen" style="display: none;">
+            <h2 id="question"></h2>
+            <div id="answers"></div>
+            <button id="next-button">Nächste Frage</button>
+        </div>
+
+        <div id="result-screen" style="display: none;">
+            <h1>Quiz beendet!</h1>
+            <p>Du hast <span id="score"></span> von <span id="total"></span> Fragen richtig beantwortet.</p>
+            <button id="restart-button">Erneut spielen</button>
+        </div>
+    </div>
+    <script>
+        const questions = [
+            {
+                question: "Welches Tier zieht den Schlitten des Weihnachtsmanns?",
+                answers: ["Elch", "Rentier", "Hirsch", "Kamel"],
+                correct: 1
+            },
+            {
+                question: "In welchem Land entstand der erste Weihnachtsbaum?",
+                answers: ["Deutschland", "USA", "Norwegen", "Schweden"],
+                correct: 0
+            },
+            {
+                question: "Wie heißt der Weihnachtsklassiker mit Kevin allein zu Hause?",
+                answers: ["Kevin und die Gangster", "Allein zu Haus", "Kevin allein in New York", "Kevin allein zu Hause"],
+                correct: 3
+            }
+        ];
+
+        let currentQuestionIndex = 0;
+        let score = 0;
+
+        const startScreen = document.getElementById("start-screen");
+        const quizScreen = document.getElementById("quiz-screen");
+        const resultScreen = document.getElementById("result-screen");
+        const questionElement = document.getElementById("question");
+        const answersElement = document.getElementById("answers");
+        const nextButton = document.getElementById("next-button");
+        const scoreElement = document.getElementById("score");
+        const totalElement = document.getElementById("total");
+
+        document.getElementById("start-button").addEventListener("click", startQuiz);
+        nextButton.addEventListener("click", showNextQuestion);
+        document.getElementById("restart-button").addEventListener("click", restartQuiz);
+
+        function startQuiz() {
+            startScreen.style.display = "none";
+            quizScreen.style.display = "block";
+            currentQuestionIndex = 0;
+            score = 0;
+            showQuestion();
+        }
+
+        function showQuestion() {
+            const currentQuestion = questions[currentQuestionIndex];
+            questionElement.textContent = currentQuestion.question;
+            answersElement.innerHTML = "";
+            nextButton.style.display = "none";
+
+            currentQuestion.answers.forEach((answer, index) => {
+                const button = document.createElement("button");
+                button.textContent = answer;
+                button.addEventListener("click", () => selectAnswer(index));
+                answersElement.appendChild(button);
+            });
+        }
+
+        function selectAnswer(index) {
+            const currentQuestion = questions[currentQuestionIndex];
+            if (index === currentQuestion.correct) {
+                score++;
+            }
+            nextButton.style.display = "block";
+            Array.from(answersElement.children).forEach((button, i) => {
+                button.disabled = true;
+                button.style.backgroundColor = i === currentQuestion.correct ? "#28a745" : "#dc3545";
+            });
+        }
+
+        function showNextQuestion() {
+            currentQuestionIndex++;
+            if (currentQuestionIndex < questions.length) {
+                showQuestion();
+            } else {
+                showResults();
+            }
+        }
+
+        function showResults() {
+            quizScreen.style.display = "none";
+            resultScreen.style.display = "block";
+            scoreElement.textContent = score;
+            totalElement.textContent = questions.length;
+        }
+
+        function restartQuiz() {
+            resultScreen.style.display = "none";
+            startScreen.style.display = "block";
+        }
+    </script>
+</body>
+</html>
