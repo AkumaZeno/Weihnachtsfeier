@@ -269,4 +269,34 @@
                     <li>
                         ${entry.name}
                         <span>${entry.score} Punkte</span>
-                        <button onclick="deletePlayer(${index})" style="background-color: #dc3545; color
+                        <button onclick="deletePlayer(${index})" style="background-color: #dc3545; color: white; border: none; padding: 5px; border-radius: 5px; cursor: pointer;">Löschen</button>
+                    </li>
+                `)
+                .join("");
+        }
+
+        function deletePlayer(index) {
+            if (confirm("Möchtest du diesen Spieler wirklich aus der Rangliste löschen?")) {
+                leaderboard.splice(index, 1);
+                localStorage.setItem("leaderboard", JSON.stringify(leaderboard));
+                updateLeaderboard();
+            }
+        }
+
+        function resetTimer() {
+            clearInterval(timer);
+            let timeLeft = 10;
+            timerElement.textContent = timeLeft;
+            timer = setInterval(() => {
+                timeLeft--;
+                timerElement.textContent = timeLeft;
+                if (timeLeft <= 0) {
+                    clearInterval(timer);
+                    nextButton.style.display = "block";
+                    Array.from(answersElement.children).forEach(button => (button.disabled = true));
+                }
+            }, 1000);
+        }
+    </script>
+</body>
+</html>
