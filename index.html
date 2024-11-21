@@ -27,12 +27,8 @@
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         }
 
-        h1, h2, p {
-            margin: 10px 0;
-        }
-
         button {
-            padding: 12px 20px;
+            padding: 10px 20px;
             font-size: 16px;
             background-color: #28a745;
             color: white;
@@ -77,10 +73,6 @@
             z-index: 1000;
         }
 
-        #leaderboard-modal h3 {
-            margin-bottom: 10px;
-        }
-
         #leaderboard-modal ul {
             list-style: none;
             padding: 0;
@@ -89,6 +81,7 @@
         #leaderboard-modal li {
             display: flex;
             justify-content: space-between;
+            align-items: center;
             margin-bottom: 10px;
         }
 
@@ -110,7 +103,6 @@
             border-radius: 5px;
             padding: 5px 10px;
             cursor: pointer;
-            margin-top: 10px;
         }
     </style>
 </head>
@@ -222,9 +214,9 @@
             clearInterval(timer);
             const currentQuestion = questions[currentQuestionIndex];
             if (index === currentQuestion.correct) {
-                score += 2; // 2 Punkte für eine richtige Antwort
+                score += 2;
             } else {
-                score -= 1; // 1 Punkt Abzug für eine falsche Antwort
+                score -= 1;
             }
             nextButton.style.display = "block";
             Array.from(answersElement.children).forEach((button, i) => {
@@ -267,9 +259,9 @@
             leaderboardElement.innerHTML = leaderboard
                 .map((entry, index) => `
                     <li>
-                        ${entry.name}
+                        <span>${entry.name}</span>
                         <span>${entry.score} Punkte</span>
-                        <button onclick="deletePlayer(${index})" style="background-color: #dc3545; color: white; border: none; padding: 5px; border-radius: 5px; cursor: pointer;">Löschen</button>
+                        <button onclick="deletePlayer(${index})" style="background-color: #dc3545; color: white; border: none; padding: 5px 10px; border-radius: 5px; cursor: pointer;">Löschen</button>
                     </li>
                 `)
                 .join("");
